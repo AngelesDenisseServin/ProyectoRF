@@ -27,6 +27,7 @@ hay_coincidenciapagina=0
 mensaje_registro_usuario=0
 rutaimg=""
 banderabuscar=0
+video_ruta='videosdepruebas/video1.mp4'
 bandera=0
 Nombre_persona_registradaimg=''
 id_historial=0
@@ -97,7 +98,7 @@ def get(usuarion:str,contrasen:str):
                 mensaje=1
                 return RedirectResponse(url="/")
 
-@app.get('/paginaprincipal')
+@app.route('/paginaprincipal')
 def get():  
     img_ruta ="Galeriap/imagen_cargada.png"
     if not os.path.exists(img_ruta):
@@ -127,7 +128,7 @@ def get():
     return pagina
 
 def generar_frames(): 
-    video_ruta = 'videograbado/video4.mp4' 
+    global video_ruta 
     cam = cv2.VideoCapture(video_ruta)
     if not cam.isOpened():
         return "Error al abrir la cámara"
@@ -148,7 +149,7 @@ def generar_framesbuscar():
     carpeta_coincidencias = 'Coincidencias_web'
     if not os.path.exists(carpeta_coincidencias):
         os.makedirs(carpeta_coincidencias)
-    video_ruta = 'videograbado/video4.mp4'  
+    global video_ruta  
     cam = cv2.VideoCapture(video_ruta)
     if not cam.isOpened():
         return "Error al abrir el video"
@@ -232,7 +233,7 @@ def cargar_imagen(imagen: UploadFile ):
     img.save(img_ruta)
     print(f"Imagen guardada en: {img_ruta}")
     rutaimg=img_ruta
-    return RedirectResponse(url="/paginaprincipal")
+    return RedirectResponse(url="/paginaprincipal", status_code=302)
   
 @app.route('/regis')
 def reintento():
