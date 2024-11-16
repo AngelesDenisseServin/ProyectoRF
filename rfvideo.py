@@ -19,7 +19,7 @@ def verificar_cara(cara_recortada, cara_extraviada):
 
     return resultado_cara['verified']
 contador_fotogramas = 0
-procesar_fotogramas = 5  
+
 
 if not video.isOpened():
     print("Error al abrir el archivo de video.")
@@ -35,8 +35,8 @@ while video.isOpened():
         break  
     
     contador_fotogramas += 1
-    if contador_fotogramas % procesar_fotogramas == 0:
-        try: 
+    
+    try: 
             fotograma=cv2.resize(fotograma,(0,0),fx=0.7,fy=0.7)
             caras = cascada_cara.detectMultiScale(fotograma, 1.1, 5, minSize=(24, 24))
             for (x, y, w, h) in caras:
@@ -55,7 +55,7 @@ while video.isOpened():
                     
                 else:
                     print("Sin coincidencia")
-        except Exception as e:
+    except Exception as e:
             print(f"Error al verificar rostro: {e}")
     
     if cv2.waitKey(1) & 0xFF == ord('q'):
