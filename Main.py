@@ -183,9 +183,9 @@ def generar_framesbuscar():
                         w = datos_cara['w']
                         h = datos_cara['h']
                         cv2.rectangle(fotograma, (x, y), (x+w, y+h), (0, 255, 0), 2)
-                        cv2.putText(fotograma, 'Coincidencia Encontrada!', (x-10, y-10), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
-                        cv2.imshow('Coincidencia', fotograma)
+                        cv2.putText(fotograma, 'Coincidencia Encontrada', (x-10, y-10), 
+                         cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+                        
                         nombre_imagen = os.path.join(carpeta_coincidencias, f'coincidencia_{contador_fotogramas}.png')
                         cv2.imwrite(nombre_imagen, fotograma)
                         print(f'Imagen guardada: {nombre_imagen}')
@@ -194,7 +194,7 @@ def generar_framesbuscar():
             except Exception as e:
                          print(f"Error al verificar rostro: {e}")
         if bandera_coincidencia==1:
-                cv2.putText(fotograma, 'Coincidencia Encontrada!', (50, 50),
+                cv2.putText(fotograma, 'Coincidencia Encontrada', (50, 50),
                     cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
         if not ret:
             break
