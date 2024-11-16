@@ -143,18 +143,29 @@ def generar_frames():
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
 
+def verificar_cara(Fotograma, cara_extraviada):
+    resultado = DeepFace.verify(Fotograma, cara_extraviada, 
+                                model_name="Facenet512", 
+                                distance_metric="cosine", 
+                                enforce_detection=False,  
+                                detector_backend="mtcnn", 
+                                threshold=0.4, 
+                                normalization="base")
+   
+    return resultado['verified'], resultado
 def generar_framesbuscar():
     bandera_coincidencia=0
-    cara_persona_extraviada = cv2.imread('Galeria/Denisse/cara_t3.png')
+    cara_persona_extraviada = cv2.imread('Galeriap/imagen_cargada.png')
     carpeta_coincidencias = 'Coincidencias_web'
     if not os.path.exists(carpeta_coincidencias):
         os.makedirs(carpeta_coincidencias)
-    global video_ruta  
+    global video_ruta 
     cam = cv2.VideoCapture(video_ruta)
     if not cam.isOpened():
         return "Error al abrir el video"
     contador_fotogramas = 0
-    procesar_fotogramas = 5 
+    
+    
     while True:
         ret, fotograma = cam.read()
         if not ret or fotograma is None:
@@ -162,37 +173,25 @@ def generar_framesbuscar():
             break 
         if os.path.isfile('Galeriap/imagen_cargada.png'):
             contador_fotogramas += 1
-            if contador_fotogramas % procesar_fotogramas == 0:
-                try:
-                    cascada_cara = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
-                    caras = cascada_cara.detectMultiScale(fotograma, 1.1, 5, minSize=(24, 24))
-                    cara_persona_extraviada=cv2.imread('Galeriap/imagen_cargada.png')
-                    
-                    for (x, y, w, h) in caras:
-                        caradeimagen_recortada = fotograma[y:y+h, x:x+w] 
-                        verificar_cara = DeepFace.verify(caradeimagen_recortada, cara_persona_extraviada, 
-                                                            model_name="Facenet512", 
-                                                            distance_metric="cosine", 
-                                                            enforce_detection=False,  
-                                                            detector_backend="mtcnn", 
-                                                            threshold=0.3, 
-                                                            normalization="base")
-                            
-                            
-                        if verificar_cara['verified']:
-                                    bandera_coincidencia=1
-                                    cv2.rectangle(fotograma, (x, y), (x+w, y+h), (0, 255, 0), 2)
-                                    cv2.putText(fotograma, 'Coincidencia Encontrada!', (x-10, y-10), 
-                                                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)                                 
-                                    print("coincidencia encontrada")
-                                    nombre_imagen = os.path.join(carpeta_coincidencias, f'coincidencia_{contador_fotogramas}.png')
-                                    cv2.imwrite(nombre_imagen, fotograma)
-                                    print(f'Imagen guardada: {nombre_imagen}')
-                                        
-                        else:
-                                
-                                     print("Sin coincidencia")
-                except Exception as e:
+            try:
+                    ver, resultado_verificacion = verificar_cara(fotograma,cara_persona_extraviada)
+                    if ver:
+                        bandera_coincidencia=1
+                        datos_cara = resultado_verificacion['facial_areas']['img1']
+                        x = datos_cara['x']
+                        y = datos_cara['y']
+                        w = datos_cara['w']
+                        h = datos_cara['h']
+                        cv2.rectangle(fotograma, (x, y), (x+w, y+h), (0, 255, 0), 2)
+                        cv2.putText(fotograma, 'Coincidencia Encontrada!', (x-10, y-10), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+                        cv2.imshow('Coincidencia', fotograma)
+                        nombre_imagen = os.path.join(carpeta_coincidencias, f'coincidencia_{contador_fotogramas}.png')
+                        cv2.imwrite(nombre_imagen, fotograma)
+                        print(f'Imagen guardada: {nombre_imagen}')
+                    else:
+                        print("Sin coincidencia")
+            except Exception as e:
                          print(f"Error al verificar rostro: {e}")
         if bandera_coincidencia==1:
                 cv2.putText(fotograma, 'Coincidencia Encontrada!', (50, 50),
@@ -205,6 +204,7 @@ def generar_framesbuscar():
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
     cam.release()
+
 
 @app.route('/video_feed')
 def video_feed():
