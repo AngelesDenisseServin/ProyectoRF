@@ -402,8 +402,9 @@ def get(nombre:str,edad:str,Numcont:str,Nomcont:str,FechaD:date,hora:str,Reporta
               IdH=''
               for r in resultar:
                             IdH=r[0]
+              ruta_completa=''
               if banderabuscar==1:
-                ruta_completa=''
+                
                 extensiones_imagenes = (".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff")
                 origen='Coincidencias_web'
                 destino=carpeta_persona_extraviada 
